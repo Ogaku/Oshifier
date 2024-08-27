@@ -68,11 +68,26 @@ export function activate(context: vscode.ExtensionContext) {
 						while (jsonContent.messages.some((message: any) => message.id === newMessage.id))
 							newMessage.id = crypto.randomUUID().toUpperCase();
 
-						jsonContent.messages.push(newMessage);
+						const existingMessage = jsonContent.messages.find((message: any) => message.translation === newMessage.translation);
+						if (existingMessage) {
+							editor.edit(editBuilder => {
+								editBuilder.replace(selection, placeholders.length === 0 ? `'${existingMessage.id}'.localized` : `'${existingMessage.id}'.localized.format(${placeholders.join(', ')})`);
+							});
+						} else {
+							jsonContent.messages.push(newMessage);
 
-						editor.edit(editBuilder => {
-							editBuilder.replace(selection, placeholders.length === 0 ? `'${newMessage.id}'.localized` : `'${newMessage.id}'.localized.format(${placeholders.join(', ')})`);
-						});
+							editor.edit(editBuilder => {
+								editBuilder.replace(selection, placeholders.length === 0 ? `'${newMessage.id}'.localized` : `'${newMessage.id}'.localized.format(${placeholders.join(', ')})`);
+							});
+
+							fs.writeFile(filePath, JSON.stringify(jsonContent, null, 2), 'utf8', (err) => {
+								if (err) {
+									vscode.window.showErrorMessage(`Error saving file: ${err.message}`);
+									return;
+								}
+								vscode.window.showInformationMessage(`File saved: ${filePath}`);
+							});
+						}
 
 						fs.writeFile(filePath, JSON.stringify(jsonContent, null, 2), 'utf8', (err) => {
 							if (err) {

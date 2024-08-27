@@ -2,8 +2,12 @@
   "name": "oshifier",
   "displayName": "Oshifier",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "publisher": "Ogaku",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ogaku/Oshifier"
+  },
   "engines": {
     "vscode": "^1.92.0"
   },
